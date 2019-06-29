@@ -1,22 +1,32 @@
 import React, {Component} from 'react';
+import { connect } from 'react-redux';
 import CardList from './Components/CardList';
 import SearchBox from './Components/SearchBox';
 import Scroll from './Components/Scroll';
 import { Pacman } from 'react-pure-loaders'
 import './App.css';
 import ErrorBoundry from './Components/ErrorBoundry';
+import { setSearchField } from './Action';
+
+const mapStateToProps = (state) => {
+    return {
+        searchField : state.searchField,
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onSearchChange : (event) => dispatch(setSearchField(event.target.value))
+    }
+}
 class App extends Component {
     constructor(){
 
         super();
 
         this.state = {
-            robots : [],
-            searchField : '',
-            isLoading : true
+            robots : []
         }
-
-        this.onSearchChange = this.onSearchChange.bind(this);
     }
 
 
@@ -24,39 +34,31 @@ class App extends Component {
         fetch('https://jsonplaceholder.typicode.com/users').then(
             response => response.json()
         )
-        .then((users) => this.setState({robots : users  }))
-    }
-
-    onSearchChange(event){
-        
-        // Set the searchfield based on text in searchbar
-        this.setState({
-            searchField : event.target.value,
-        })
+        .then((users) => this.setState({robots : users}))
     }
 
     render(){
 
+        const {searchField, onSearchChange } = this.props;
+
         const filteredRobots = this.state.robots.filter((robot) => {
-            return robot.name.toLowerCase().includes(this.state.searchField.toLowerCase())
+            return robot.name.toLowerCase().includes(searchField.toLowerCase())
         });
 
-        if(this.state.robots.length === 0){
-            return <Pacman className="center-ns" loading={this.state.isLoading}/>
-        }else{
-            return(
-                <div className="tc">
-                    <h1 className="f3">RoboFriends</h1>
-                    <SearchBox searchChange={this.onSearchChange}/>
-                    <Scroll>
-                        <ErrorBoundry>
-                            <CardList robots={filteredRobots}/>
-                        </ErrorBoundry>
-                    </Scroll>
-                </div>
-            )
-        }
+        return(
+            <div className="tc">
+                <h1 className="f3">RoboFriends</h1>
+                <SearchBox searchChange={onSearchChange}/>
+                <Scroll>
+                    <ErrorBoundry>
+                        <CardList robots={filteredRobots}/>
+                    </ErrorBoundry>
+                </Scroll>
+            </div>
+        )
+        
     }
 }
 
-export default App;
+// connect() returns a function which executes App, that's why App is put inside ()
+export default connect(mapStateToProps, mapDispatchToProps)(App);
