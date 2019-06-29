@@ -1,46 +1,62 @@
-import React from 'react';
-import CardList from './CardList';
-import SearchBox from './SearchBox';
-import Scroll from './Scroll';
+import React, {Component} from 'react';
+import CardList from './Components/CardList';
+import SearchBox from './Components/SearchBox';
+import Scroll from './Components/Scroll';
+import { Pacman } from 'react-pure-loaders'
 import './App.css';
+import ErrorBoundry from './Components/ErrorBoundry';
+class App extends Component {
+    constructor(){
 
-class App extends React.Component{
-	constructor(){
-		super();
-		this.state = {
-			robots : [],
-			searchField : ''
-		}
-	}
+        super();
 
-	componentDidMount(){
-		fetch('https://jsonplaceholder.typicode.com/users').then(response => {
-			return response.json();
-		}).then(users => {
-			this.setState({robots : users});
-		})
-	}
+        this.state = {
+            robots : [],
+            searchField : '',
+            isLoading : true
+        }
 
-	onSearchChange = (event) => {
-		this.setState({ searchField : event.target.value })
-	}
+        this.onSearchChange = this.onSearchChange.bind(this);
+    }
 
-	render(){
-		const filteredRobots = this.state.robots.filter(robots =>{
-		return robots.name.toLowerCase().includes(this.state.searchField.toLowerCase())
-		})
-		return(
-			<div className="tc">
-				<h1 className="f1" >RoboFriends</h1>
-				<SearchBox searchChange={this.onSearchChange}/>
-				<Scroll>
-					<CardList robots={filteredRobots}/>
-				</Scroll>
-			</div>
-		);
-	}
+
+    componentDidMount(){
+        fetch('https://jsonplaceholder.typicode.com/users').then(
+            response => response.json()
+        )
+        .then((users) => this.setState({robots : users  }))
+    }
+
+    onSearchChange(event){
+        
+        // Set the searchfield based on text in searchbar
+        this.setState({
+            searchField : event.target.value,
+        })
+    }
+
+    render(){
+
+        const filteredRobots = this.state.robots.filter((robot) => {
+            return robot.name.toLowerCase().includes(this.state.searchField.toLowerCase())
+        });
+
+        if(this.state.robots.length === 0){
+            return <Pacman className="center-ns" loading={this.state.isLoading}/>
+        }else{
+            return(
+                <div className="tc">
+                    <h1 className="f3">RoboFriends</h1>
+                    <SearchBox searchChange={this.onSearchChange}/>
+                    <Scroll>
+                        <ErrorBoundry>
+                            <CardList robots={filteredRobots}/>
+                        </ErrorBoundry>
+                    </Scroll>
+                </div>
+            )
+        }
+    }
 }
-
-
 
 export default App;
