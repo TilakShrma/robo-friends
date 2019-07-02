@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import CardList from './Components/CardList';
 import SearchBox from './Components/SearchBox';
 import Scroll from './Components/Scroll';
-import { Pacman } from 'react-pure-loaders'
 import './App.css';
 import ErrorBoundry from './Components/ErrorBoundry';
 import { setSearchField } from './Action';

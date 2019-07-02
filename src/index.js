@@ -1,15 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import {createStore} from 'redux';
+import {createStore, applyMiddleware} from 'redux';
+import { createLogger } from 'redux-logger';
 import './index.css';
 import App from './App';
 import 'tachyons';
 import * as serviceWorker from './serviceWorker';
 import { searchRobots } from './reducers';
 
+// create logger 
+const logger = createLogger();
+
 // Change later searchRobots to root reducer
-const store = createStore(searchRobots);
+// inject logger as a part of middleware to the app
+const store = createStore(searchRobots, applyMiddleware(logger));
 
 ReactDOM.render(
     <Provider store={store}>
